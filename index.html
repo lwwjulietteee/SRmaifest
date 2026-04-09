@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>为Sherry & Robert显化 💕</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:       #0d0d0d;
+    --dark:        #161616;
+    --dark2:       #1e1e1e;
+    --pink:        #ff2d78;
+    --pink-soft:   #ff6fa3;
+    --pink-light:  #ffb3d0;
+    --pink-dim:    #3d0a1e;
+    --white:       #f5f0f5;
+    --muted:       #9a6a7a;
+    --shadow:      rgba(255,45,120,0.2);
+    --pixel:       "Space Mono", "Courier New", monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--pixel), 'Noto Sans SC', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    image-rendering: pixelated;
+  }
+
+  /* 背景网格 pixel art 感 */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,45,120,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,45,120,0.04) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(255,45,120,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(255,45,120,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(30,0,15,0.6) 0%, transparent 80%);
+    pointer-events: none;
+  }
+
+  /* 像素漂浮物 */
+  .petal {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0;
+    animation: petalFall linear infinite;
+    top: -40px;
+    image-rendering: pixelated;
+    font-size: 14px;
+  }
+  @keyframes petalFall {
+    0%   { opacity: 0; transform: translateY(0); }
+    8%   { opacity: 0.9; }
+    85%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translateY(108vh); }
+  }
+
+  /* 右上角计数器 */
+  #counter {
+    position: fixed;
+    top: 22px;
+    right: 26px;
+    text-align: right;
+    z-index: 100;
+  }
+  #counter .count {
+    font-family: var(--pixel);
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--pink);
+    line-height: 1;
+    letter-spacing: -2px;
+    transition: transform 0.1s;
+    text-shadow: 
+      3px 3px 0px #8b0033,
+      0 0 20px rgba(255,45,120,0.5);
+  }
+  #counter .count.bump {
+    transform: scale(1.15);
+  }
+  #counter .count-label {
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  /* 重置按钮 */
+  #resetBtn {
+    position: fixed;
+    top: 22px;
+    left: 26px;
+    background: var(--dark2);
+    border: 2px solid var(--pink-dim);
+    color: var(--muted);
+    font-family: var(--pixel);
+    font-size: 11px;
+    font-weight: 400;
+    padding: 8px 16px;
+    border-radius: 0px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 100;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    image-rendering: pixelated;
+  }
+  #resetBtn:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+    box-shadow: 0 0 12px rgba(255,45,120,0.3), inset 0 0 8px rgba(255,45,120,0.1);
+  }
+
+  /* 标题 */
+  .title-wrap {
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .title {
+    font-family: var(--pixel);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+  .title .pink { color: var(--pink); }
+  .title-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 6px;
+    font-family: var(--pixel);
+  }
+  .lyrics-line {
+    font-size: 9px;
+    color: var(--pink-soft);
+    letter-spacing: 1.5px;
+    font-style: italic;
+    margin-top: 4px;
+    font-family: var(--pixel);
+    opacity: 0.8;
+    animation: lyricsFade 4s ease-in-out infinite;
+  }
+  @keyframes lyricsFade {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* 主区域 */
+  .main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* 小马按钮 */
+  #horseBtn {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    background: none;
+    border: none;
+    outline: none;
+  }
+
+  /* 像素光晕 */
+  .pixel-halo {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border: 2px solid var(--pink);
+    opacity: 0.15;
+    animation: haloSpin 6s linear infinite;
+    image-rendering: pixelated;
+  }
+  .pixel-halo-2 {
+    width: 210px;
+    height: 210px;
+    border: 1px solid var(--pink-soft);
+    opacity: 0.08;
+    animation: haloSpin 10s linear infinite reverse;
+  }
+  @keyframes haloSpin {
+    0% { transform: rotate(0deg); opacity: 0.15; }
+    50% { opacity: 0.3; }
+    100% { transform: rotate(360deg); opacity: 0.15; }
+  }
+
+  #horseBtn.hit .pixel-halo {
+    border-color: var(--pink);
+    opacity: 0.6;
+    box-shadow: 0 0 20px var(--pink);
+  }
+
+  /* 像素小马SVG */
+  #horseSvg {
+    width: 150px;
+    height: 150px;
+    transition: transform 0.09s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    position: relative;
+    z-index: 2;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 15px rgba(255,45,120,0.4));
+  }
+  #horseBtn.hit #horseSvg {
+    transform: scale(0.88) translateY(8px);
+    filter: drop-shadow(0 0 5px rgba(255,45,120,0.6));
+  }
+
+  /* 提示文字 */
+  .tap-hint {
+    font-family: var(--pixel);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: hintBlink 1.2s step-end infinite;
+  }
+  @keyframes hintBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* 浮动文字 */
+  .float-text {
+    position: fixed;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--pink);
+    pointer-events: none;
+    z-index: 200;
+    animation: floatUp 1.0s ease-out forwards;
+    white-space: nowrap;
+    font-family: var(--pixel);
+    image-rendering: pixelated;
+  }
+  @keyframes floatUp {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-80px) scale(0.7); }
+  }
+
+  /* 已达成徽章 */
+  .achieved-list {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    justify-content: flex-start;
+    max-width: 92vw;
+    width: 92vw;
+    overflow-x: auto;
+    z-index: 50;
+    padding: 4px 2px 8px;
+    scrollbar-width: none;
+  }
+  .achieved-list::-webkit-scrollbar { display: none; }
+  .achieved-badge {
+    font-family: var(--pixel);
+    font-size: 9px;
+    font-weight: 400;
+    padding: 5px 12px;
+    border-radius: 0;
+    background: var(--dark2);
+    border: 1px solid var(--pink-dim);
+    color: var(--pink-soft);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+
+  /* 烟花 */
+  #fireworksCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 300;
+  }
+
+  /* 里程碑弹窗 */
+  #milestoneOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(13,0,8,0.92);
+    z-index: 400;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  #milestoneOverlay.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .milestone-box {
+    background: var(--dark);
+    border: 2px solid var(--pink);
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 400px;
+    width: 90vw;
+    image-rendering: pixelated;
+    box-shadow: 0 0 40px rgba(255,45,120,0.3), inset 0 0 20px rgba(255,45,120,0.05);
+    animation: msAppear 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes msAppear {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .milestone-icon { font-size: 44px; display: block; margin-bottom: 12px; }
+  .milestone-count {
+    font-family: var(--pixel);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--pink);
+    letter-spacing: -1px;
+    text-shadow: 2px 2px 0 #8b0033, 0 0 20px rgba(255,45,120,0.5);
+  }
+  .milestone-text {
+    font-family: var(--pixel);
+    font-size: 13px;
+    color: var(--white);
+    margin-top: 12px;
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
+  .milestone-btn {
+    margin-top: 28px;
+    background: var(--pink);
+    border: none;
+    color: var(--black);
+    font-family: var(--pixel);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 12px 28px;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    border-radius: 0;
+  }
+  .milestone-btn:hover {
+    background: var(--pink-soft);
+    box-shadow: 0 0 20px rgba(255,45,120,0.5);
+  }
+
+  /* 扫描线效果 */
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+<canvas id="fireworksCanvas"></canvas>
+
+<button id="resetBtn" onclick="resetCount()">[ RESET ]</button>
+
+<div id="counter">
+  <div class="count" id="countDisplay">0</div>
+</div>
+
+<div class="main">
+  <div class="title-wrap">
+    <div class="title">SHERRY <span class="pink">♥</span> ROBERT</div>
+    <div class="title-sub">in london</div>
+  </div>
+
+  <button id="horseBtn"
+    onmousedown="startHit(event)"
+    onmouseup="endHit()"
+    ontouchstart="startHit(event)"
+    ontouchend="endHit()"
+    onclick="hit(event)">
+    <div class="pixel-halo pixel-halo-2"></div>
+    <div class="pixel-halo"></div>
+
+    <!-- 手绘像素风可爱小马 SVG -->
+    <svg id="horseSvg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+      <!-- 身体 -->
+      <rect x="16" y="30" width="28" height="18" fill="#ff6fa3"/>
+      <rect x="14" y="28" width="32" height="22" rx="4" fill="#ff6fa3"/>
+      <!-- 肚子颜色 -->
+      <rect x="18" y="36" width="20" height="10" rx="3" fill="#ffb3d0"/>
+      <!-- 脖子 -->
+      <rect x="38" y="22" width="8" height="14" rx="3" fill="#ff6fa3"/>
+      <!-- 头部 -->
+      <rect x="38" y="10" width="14" height="16" rx="4" fill="#ff6fa3"/>
+      <!-- 鼻子/嘴巴 -->
+      <rect x="48" y="20" width="6" height="6" rx="2" fill="#ffb3d0"/>
+      <rect x="49" y="24" width="2" height="2" fill="#ff2d78"/>
+      <rect x="51" y="24" width="2" height="2" fill="#ff2d78"/>
+      <!-- 眼睛 -->
+      <rect x="42" y="14" width="4" height="4" rx="1" fill="#0d0d0d"/>
+      <rect x="43" y="15" width="2" height="2" rx="1" fill="#fff"/>
+      <rect x="43" y="15" width="1" height="1" fill="#0d0d0d"/>
+      <!-- 耳朵 -->
+      <rect x="40" y="6" width="4" height="6" rx="2" fill="#ff6fa3"/>
+      <rect x="47" y="4" width="4" height="6" rx="2" fill="#ff6fa3"/>
+      <rect x="41" y="7" width="2" height="4" rx="1" fill="#ffb3d0"/>
+      <rect x="48" y="5" width="2" height="4" rx="1" fill="#ffb3d0"/>
+      <!-- 鬃毛 (像素风) -->
+      <rect x="36" y="8" width="3" height="14" rx="1" fill="#ff2d78"/>
+      <rect x="39" y="6" width="3" height="12" rx="1" fill="#ff2d78"/>
+      <rect x="33" y="12" width="3" height="10" rx="1" fill="#ffb3d0"/>
+      <!-- 尾巴 -->
+      <rect x="12" y="28" width="4" height="14" rx="2" fill="#ff2d78"/>
+      <rect x="10" y="30" width="4" height="10" rx="2" fill="#ffb3d0"/>
+      <rect x="8" y="34" width="4" height="6" rx="2" fill="#ff2d78"/>
+      <!-- 前腿 -->
+      <rect x="24" y="48" width="5" height="10" rx="2" fill="#ff6fa3"/>
+      <rect x="31" y="48" width="5" height="10" rx="2" fill="#ff6fa3"/>
+      <!-- 蹄子 -->
+      <rect x="23" y="56" width="7" height="4" rx="1" fill="#8b0033"/>
+      <rect x="30" y="56" width="7" height="4" rx="1" fill="#8b0033"/>
+      <!-- 后腿 -->
+      <rect x="14" y="48" width="5" height="10" rx="2" fill="#ff6fa3"/>
+      <rect x="37" y="48" width="5" height="10" rx="2" fill="#ff6fa3"/>
+      <rect x="13" y="56" width="7" height="4" rx="1" fill="#8b0033"/>
+      <rect x="36" y="56" width="7" height="4" rx="1" fill="#8b0033"/>
+      <!-- 小星星装饰 -->
+      <rect x="20" y="33" width="2" height="2" fill="#fff" opacity="0.8"/>
+      <rect x="26" y="38" width="2" height="2" fill="#fff" opacity="0.6"/>
+      <rect x="32" y="34" width="2" height="2" fill="#fff" opacity="0.7"/>
+      <!-- 腮红 -->
+      <rect x="50" y="19" width="4" height="2" rx="1" fill="#ff2d78" opacity="0.5"/>
+    </svg>
+  </button>
+
+  <div class="tap-hint">▶ CLICK TO MANIFEST ◀</div>
+</div>
+
+<div class="achieved-list" id="achievedList"></div>
+
+<!-- 里程碑弹窗 -->
+<div id="milestoneOverlay">
+  <div class="milestone-box">
+    <span class="milestone-icon" id="msIcon"></span>
+    <div class="milestone-count" id="msCount"></div>
+    <div class="milestone-text" id="msText"></div>
+    <button class="milestone-btn" onclick="closeMilestone()">[ CONTINUE MANIFEST ]</button>
+  </div>
+</div>
+
+<script>
+const MILESTONES = [
+  { count: 50,   icon: '📲', text: 'Robert reaches out first\nafter the silence, he comes back' },
+  { count: 100,  icon: '💬', text: 'The conversation picks up\nlike no time has passed at all' },
+  { count: 200,  icon: '🧋', text: 'First date in Guangzhou\ncoffee, then walking, then talking forever' },
+  { count: 300,  icon: '🎬', text: 'They watch an arthouse film together\nA24 vibes — he gets why she cries' },
+  { count: 400,  icon: '🌙', text: 'Deep talk until 3am\nlife, dreams, everything' },
+  { count: 500,  icon: '🙈', text: 'All the other girls he was talking to\nsuddenly feel incredibly dull\nhe stops replying to them' },
+  { count: 600,  icon: '💅', text: 'Every other girl suddenly looks\nvery, very plain\nSherry wins effortlessly' },
+  { count: 700,  icon: '🍳', text: 'Robert makes Sherry breakfast\nproperly done, with love' },
+  { count: 800,  icon: '🌹', text: 'Robert makes it official\n"I really like you, Sherry"' },
+  { count: 900,  icon: '✈️', text: 'Robert says: "come visit me in London"\nSherry books the flight' },
+  { count: 1000, icon: '🌧️', text: 'Sherry lands in London\nRobert is waiting at arrivals' },
+  { count: 1200, icon: '🎷', text: 'Robert takes her to Ronnie\'s Jazz Bar\nhe knew she\'d love it' },
+  { count: 1400, icon: '🌍', text: 'Robert shows Sherry his London\nthe hidden corners only locals know' },
+  { count: 1600, icon: '🎸', text: 'Notting Hill market on a Saturday\nhe buys her a vinyl record' },
+  { count: 1800, icon: '🌃', text: 'By the Thames at night\nhe tells her he never wants her to leave' },
+  { count: 2000, icon: '🏠', text: 'Robert introduces Sherry to his friends\neveryone absolutely loves her' },
+  { count: 2500, icon: '💌', text: 'Robert writes her a handwritten letter\nsays she\'s the best thing in his London life' },
+  { count: 3000, icon: '💍', text: 'On top of Primrose Hill\nhe says "I love you"\nshe cries' },
+  { count: 4000, icon: '🥂', text: 'Happy ending\nSherry & Robert\nforever in London 🌧️💕' },
+];
+
+let count       = parseInt(localStorage.getItem('sherryRobertCount') || '0');
+let achievedSet = new Set(JSON.parse(localStorage.getItem('sherryRobertAchieved') || '[]'));
+
+function save() {
+  localStorage.setItem('sherryRobertCount', count);
+  localStorage.setItem('sherryRobertAchieved', JSON.stringify([...achievedSet]));
+}
+
+// 音效
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTap() {
+  try {
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(660, now + 0.06);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    osc.start(now); osc.stop(now + 0.2);
+  } catch(e){}
+}
+
+// 烟花
+const canvas = document.getElementById('fireworksCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let fwActive = false;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function spawnFirework(x, y) {
+  const colors = ['#ff2d78','#ff6fa3','#ffb3d0','#fff','#ff2d78','#c0006a','#ffe0f0'];
+  const n = 60 + Math.random() * 40;
+  for (let i = 0; i < n; i++) {
+    const angle = (Math.PI * 2 * i) / n + Math.random() * 0.4;
+    const speed = 2 + Math.random() * 7;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1.5,
+      alpha: 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: Math.random() < 0.5 ? 2 : 3, // pixel squares
+      gravity: 0.12 + Math.random() * 0.08,
+      decay: 0.014 + Math.random() * 0.008,
+    });
+  }
+}
+
+function launchFireworks() {
+  fwActive = true;
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  spawnFirework(cx, cy * 0.4);
+  setTimeout(() => spawnFirework(cx - 120, cy * 0.5), 180);
+  setTimeout(() => spawnFirework(cx + 120, cy * 0.5), 240);
+  setTimeout(() => spawnFirework(cx, cy * 0.3), 450);
+  setTimeout(() => { fwActive = false; }, 3000);
+  requestAnimationFrame(animateFW);
+}
+
+function animateFW() {
+  ctx.fillStyle = 'rgba(13,0,8,0.2)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.alpha > 0.02);
+  for (const p of particles) {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += p.gravity;
+    p.vx *= 0.985;
+    p.alpha -= p.decay;
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    // pixel square instead of circle
+    ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+    ctx.restore();
+  }
+  if (particles.length > 0 || fwActive) {
+    requestAnimationFrame(animateFW);
+  } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// 像素漂浮物
+(function createPetals() {
+  const words = ['but daddy', 'i love him'];
+  const colors = ['#ff6fa3', '#ff85b3', '#ffb3d0', '#ff9ab8'];
+  for (let i = 0; i < 10; i++) {
+    const el = document.createElement('div');
+    el.className = 'petal';
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.cssText = `
+      left: ${Math.random() * 90}vw;
+      animation-duration: ${18 + Math.random() * 20}s;
+      animation-delay: ${Math.random() * 25}s;
+      font-size: 13px;
+      font-weight: 400;
+      color: ${color};
+      opacity: 0.45;
+      letter-spacing: 2px;
+      font-style: italic;
+      white-space: nowrap;
+    `;
+    el.textContent = words[i % 2];
+    document.body.appendChild(el);
+  }
+})();
+
+// 浮动文字
+const floats = ['♥', '✦', '★', '♥', '✧', '♪', '✦', '♥', '★', '✧'];
+let fi = 0;
+function showFloat(x, y) {
+  const el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = floats[fi++ % floats.length];
+  el.style.left = (x - 12) + 'px';
+  el.style.top = (y - 10) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1050);
+}
+
+// UI
+function updateUI() {
+  const el = document.getElementById('countDisplay');
+  el.textContent = count;
+  el.classList.add('bump');
+  setTimeout(() => el.classList.remove('bump'), 150);
+
+  const list = document.getElementById('achievedList');
+  list.innerHTML = '';
+  for (const m of MILESTONES) {
+    if (achievedSet.has(m.count)) {
+      const b = document.createElement('div');
+      b.className = 'achieved-badge';
+      b.textContent = m.icon + ' ' + m.text.split('\n')[0];
+      list.appendChild(b);
+    }
+  }
+}
+
+// 弹窗
+function showMilestone(m) {
+  document.getElementById('msIcon').textContent = m.icon;
+  document.getElementById('msCount').textContent = m.count + ' ✦';
+  document.getElementById('msText').textContent = m.text;
+  document.getElementById('milestoneOverlay').classList.add('show');
+  launchFireworks();
+}
+function closeMilestone() {
+  document.getElementById('milestoneOverlay').classList.remove('show');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = [];
+}
+
+// 交互
+function startHit(e) {
+  if (e) e.preventDefault();
+  document.getElementById('horseBtn').classList.add('hit');
+}
+function endHit() {
+  setTimeout(() => document.getElementById('horseBtn').classList.remove('hit'), 200);
+}
+
+let lastHitTime = 0;
+function hit(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const now = Date.now();
+  if (now - lastHitTime < 100) return;
+  lastHitTime = now;
+
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  count++;
+  save();
+  playTap();
+  updateUI();
+
+  const btn = document.getElementById('horseBtn');
+  const rect = btn.getBoundingClientRect();
+  showFloat(rect.left + rect.width / 2, rect.top + 30);
+
+  const ms = MILESTONES.find(m => m.count === count);
+  if (ms && !achievedSet.has(ms.count)) {
+    achievedSet.add(ms.count);
+    save();
+    updateUI();
+    setTimeout(() => showMilestone(ms), 380);
+  }
+}
+
+function resetCount() {
+  if (!confirm('重置所有显化进度？')) return;
+  count = 0;
+  achievedSet.clear();
+  save();
+  updateUI();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'Enter') {
+    e.preventDefault();
+    startHit();
+    hit();
+    setTimeout(endHit, 200);
+  }
+});
+
+updateUI();
+</script>
+</body>
+</html>
