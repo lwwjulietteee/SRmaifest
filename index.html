@@ -419,11 +419,10 @@
   </div>
 
   <button id="horseBtn"
-    onmousedown="startHit(event)"
+    onmousedown="startHit(event); hit(event)"
     onmouseup="endHit()"
-    ontouchstart="startHit(event)"
-    ontouchend="endHit()"
-    onclick="hit(event)">
+    ontouchstart="startHit(event); hit(event)"
+    ontouchend="endHit()">
     <div class="pixel-halo pixel-halo-2"></div>
     <div class="pixel-halo"></div>
 
